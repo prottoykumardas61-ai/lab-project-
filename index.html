@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shopping Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Smart Shopping Optimizer</h1>
+        <p>Find the best products within your budget!</p>
+    </header>
+
+    <section class="controls">
+        <label>Sort Products:</label>
+
+        <button onclick="sortByRating()">
+            Sort by Rating
+        </button>
+
+        <button onclick="sortByPriceLow()">
+            Price: Low to High
+        </button>
+
+        <button onclick="sortByPriceHigh()">
+            Price: High to Low
+        </button>
+    </section>
+
+    <section class="budget">
+        <h2>Set Your Budget</h2>
+
+        <input type="number" id="budget"
+               placeholder="Enter your budget">
+
+        <button onclick="findBestCombination()">
+            Find Best Combination
+        </button>
+    </section>
+
+    <main>
+        <h2>Available Products</h2>
+        <div id="products" class="products"></div>
+    </main>
+
+    <section class="result">
+        <h2>Best Product Combination</h2>
+        <div id="result"></div>
+    </section>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
