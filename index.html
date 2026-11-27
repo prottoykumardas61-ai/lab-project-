@@ -1,57 +1,314 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Shopping Optimizer</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Smart Shopping Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-    <header>
-        <h1>Smart Shopping Optimizer</h1>
-        <p>Find the best products within your budget!</p>
-    </header>
+<body class="bg-gray-100 p-6">
 
-    <section class="controls">
-        <label>Sort Products:</label>
+<div class="max-w-5xl mx-auto bg-white p-6 rounded shadow">
 
-        <button onclick="sortByRating()">
-            Sort by Rating
+    <h1 class="text-3xl font-bold text-center mb-6">Smart Shopping Assistant</h1>
+
+    <h2 class="text-2xl font-bold mt-4">Sort Products</h2>
+
+    <div class="flex gap-2 my-2">
+        <select id="sort" class="border p-2 rounded w-1/2">
+            <option value="rating">Rating (Quick Sort)</option>
+            <option value="low">Price Low to High (Merge Sort)</option>
+            <option value="high">Price High to Low (Merge Sort)</option>
+        </select>
+
+        <button onclick="sorthandler()" class="bg-blue-500 text-white px-4 py-2 rounded">
+            Sort
         </button>
+    </div>
 
-        <button onclick="sortByPriceLow()">
-            Price: Low to High
-        </button>
+    <div id="result" class="grid grid-cols-2 md:grid-cols-3 gap-3 "></div>
 
-        <button onclick="sortByPriceHigh()">
-            Price: High to Low
-        </button>
-    </section>
+    <h2 class="text-2xl font-bold text-center my-10">Cart Optimizer</h2>
+     <label class="text-xl  font-semibold">Budget</label>
+    <input id="budget" type="number" placeholder="Enter Your amount"
+        class="border p-2 rounded w-full my-2">
 
-    <section class="budget">
-        <h2>Set Your Budget</h2>
+    <div id="list" class="grid grid-cols-2 md:grid-cols-3 gap-1"></div>
 
-        <input type="number" id="budget"
-               placeholder="Enter your budget">
+    <button onclick="optimizeCart()" class="bg-purple-500 text-white px-4 py-2 rounded mt-2">
+        Optimize
+    </button>
 
-        <button onclick="findBestCombination()">
-            Find Best Combination
-        </button>
-    </section>
+    <div id="optResult" class="mt-4"></div>
 
-    <main>
-        <h2>Available Products</h2>
-        <div id="products" class="products"></div>
-    </main>
+</div>
 
-    <section class="result">
-        <h2>Best Product Combination</h2>
-        <div id="result"></div>
-    </section>
+<script>
 
-    <script src="script.js"></script>
+const products = [
+    { name: "Xiaomi Redmi Buds", price: 50, rating: 4.5, icon: "https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/headphones.svg" },
+    { name: "Realme Buds Wireless", price: 60, rating: 4.6, icon: "https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/headphones.svg" },
+    { name: "Samsung Galaxy Buds", price: 90, rating: 4.8, icon: "https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/headphones.svg" },
+    { name: "Apple AirPods Pro", price: 220, rating: 4.9, icon: "https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/headphones.svg" },
+    { name: "Sony WH Headphones", price: 180, rating: 4.7, icon: "https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/music.svg" },
+    { name: "JBL Tune Headphones", price: 120, rating: 4.6, icon: "https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/music.svg" },
+    { name: "Boat Rockerz Earbuds", price: 40, rating: 4.4, icon: "https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/volume-2.svg" },
+    { name: "Noise Buds VS104", price: 45, rating: 4.5, icon: "https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/volume-2.svg" }
+];
+
+//Displaying Products----------------------
+function display(arr, id) {
+    document.getElementById(id).innerHTML =
+        arr.map(p => `
+            <div class="bg-white border rounded-xl p-4 shadow-sm hover:shadow-lg transition flex flex-col gap-3">
+
+                <div class="flex items-center gap-3">
+                    <div class="bg-gray-100 p-2 rounded-full">
+                        <img src="${p.icon}" class="w-6 h-6">
+                    </div>
+
+                    <div>
+                        <div class="font-semibold text-gray-800">${p.name}</div>
+                        <div class="text-xs text-gray-500">Smart Product</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-2">
+
+                    <div class="bg-blue-100 text-blue-700 text-sm px-2 py-1 rounded-full">
+                        $Price :${p.price}
+                    </div>
+
+                    <div class="bg-yellow-100 text-yellow-700 text-sm px-2 py-1 rounded-full">
+                        Rating : ${p.rating}
+                    </div>
+
+                </div>
+
+            </div>
+        `).join("");
+}
+// ------------------------
+
+
+
+// Quick sort for rating------------------
+
+function swap(arr, i, j) {
+    let t = arr[i];
+    arr[i] = arr[j];
+    arr[j] = t;
+}
+
+function partition(arr, low, high) {
+    let pivot = arr[high].rating;
+    let i = low - 1;
+
+    for (let j = low; j < high; j++) {
+        if (arr[j].rating > pivot) {
+            i++;
+            swap(arr, i, j);
+        }
+    }
+
+    swap(arr, i + 1, high);
+    return i + 1;
+}
+
+function quickSort(arr, low, high) {
+    if (low < high) {
+        let p = partition(arr, low, high);
+        quickSort(arr, low, p - 1);
+        quickSort(arr, p + 1, high);
+    }
+}
+//-----------------------------------
+
+
+
+
+
+//Price Low to High (merge sort) ----------------------- 
+
+function mergeLow(left, right) {
+    let result = [];
+    let i = 0, j = 0;
+
+    while (i < left.length && j < right.length) {
+        if (left[i].price < right[j].price) {
+            result.push(left[i++]);
+        } else {
+            result.push(right[j++]);
+        }
+    }
+
+    return result.concat(left.slice(i)).concat(right.slice(j));
+}
+
+function mergeSortLow(arr) {
+    if (arr.length <= 1) return arr;
+
+    let mid = Math.floor(arr.length / 2);
+    return mergeLow(
+        mergeSortLow(arr.slice(0, mid)),
+        mergeSortLow(arr.slice(mid))
+    );
+}
+//------------------------
+
+
+
+
+
+//Price High to Low (merge sort) ----------------------- 
+function mergeHigh(left, right) {
+    let result = [];
+    let i = 0, j = 0;
+
+    while (i < left.length && j < right.length) {
+        if (left[i].price > right[j].price) {
+            result.push(left[i++]);
+        } else {
+            result.push(right[j++]);
+        }
+    }
+
+    return result.concat(left.slice(i)).concat(right.slice(j));
+}
+
+function mergeSortHigh(arr) {
+    if (arr.length <= 1) return arr;
+
+    let mid = Math.floor(arr.length / 2);
+    return mergeHigh(
+        mergeSortHigh(arr.slice(0, mid)),
+        mergeSortHigh(arr.slice(mid))
+    );
+}
+//----------------------
+
+
+
+
+ 
+// Sorting Handler-------------------------------
+function sorthandler() {
+    let type = document.getElementById("sort").value;
+    let arr = [...products];
+
+    if (type === "rating") {
+        quickSort(arr, 0, arr.length - 1);
+    }
+    else if (type === "low") {
+        arr = mergeSortLow(arr);
+    }
+    else {
+        arr = mergeSortHigh(arr);
+    }
+
+    display(arr, "result");
+}
+
+
+//----------------------------
+
+
+
+
+
+
+// Knapsack Algorithm for Budget optimize--------------------
+
+function knapsack(items, W) {
+    let n = items.length;
+
+    let dp = Array.from({ length: n + 1 }, () =>
+        Array(W + 1).fill(0)
+    );
+
+    for (let i = 0; i <= n; i++) {
+        for (let w = 0; w <= W; w++) {
+            if (i === 0 || w === 0)
+                dp[i][w] = 0;
+
+            else if (items[i - 1].price <= w)
+                dp[i][w] = Math.max(
+                    items[i - 1].value + dp[i - 1][w - items[i - 1].price],
+                    dp[i - 1][w]
+                );
+
+            else
+                dp[i][w] = dp[i - 1][w];
+        }
+    }
+
+    let res = [];
+    let i = n, w = W;
+
+    while (i > 0 && w > 0) {
+        if (dp[i][w] !== dp[i - 1][w]) {
+            res.push(items[i - 1]);
+            w -= items[i - 1].price;
+        }
+        i--;
+    }
+
+    return res;
+}
+
+
+
+
+
+
+
+
+
+
+
+// Showing Product in optimization Cart
+function List() {
+    document.getElementById("list").innerHTML =
+        products.map((p, i) => `
+            <label class="flex items-center gap-4 m-3 p-3  bg-blue-300 shadow text-white p-1 rounded-md">
+                <input type="checkbox" value="${i}">
+               <div class="flex flex-col"> <div class="flex gap-2"><img src="${p.icon}" class="w-5 h-5">
+                <span>${p.name}</span> </div>
+                <div><span> Price : $${p.price}</span> </div> </div>
+            </label>
+        `).join("");
+}
+
+function optimizeCart() {
+    let W = parseInt(document.getElementById("budget").value);
+
+    let checked = document.querySelectorAll("#list input:checked");
+
+    let items = Array.from(checked).map(c => {
+        let p = products[c.value];
+        return {
+            ...p,
+            value: p.rating * 10,
+            price: p.price
+        };
+    });
+
+    let res = knapsack(items, W);
+
+    document.getElementById("optResult").innerHTML =
+        res.map(p => `
+            <div class="border p-2 rounded bg-green-50 flex items-center gap-3 mt-2">
+                <img src="${p.icon}" class="w-6 h-6">
+                <div>${p.name} - $ Price :${p.price}</div>
+            </div>
+        `).join("");
+}
+
+window.onload = () => {
+    display(products, "result");
+     List();
+};
+
+</script>
 
 </body>
 </html>
