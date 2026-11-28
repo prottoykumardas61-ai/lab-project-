@@ -1,79 +1,41 @@
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
     font-family: Arial, sans-serif;
-    background: #f4f6f9;
+    background-color: #f3f4f6;
+    margin: 0;
     padding: 20px;
 }
 
-header {
-    background: #2563eb;
-    color: white;
-    text-align: center;
-    padding: 30px;
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 25px;
     border-radius: 10px;
 }
 
-header p {
-    margin-top: 10px;
-}
-
-h2 {
-    margin-bottom: 15px;
-}
-
-.controls, .budget, main, .result {
-    margin: 25px 0;
+.product-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 5px;
+    box-shadow: 0 2px 5px #ddd;
 }
 
 button {
-    padding: 10px 15px;
-    margin: 5px;
-    background: #2563eb;
-    color: white;
+    cursor: pointer;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
+    padding: 10px 15px;
 }
 
 button:hover {
-    background: #1d4ed8;
+    opacity: 0.85;
 }
 
-input {
+input, select {
     padding: 10px;
-    width: 200px;
-}
-
-.products {
-    display: grid;
-    grid-template-columns:
-        repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-.product {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px #ddd;
-}
-
-.product h3 {
-    margin-bottom: 10px;
-}
-
-.product p {
-    margin: 8px 0;
-}
-
-.result {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
